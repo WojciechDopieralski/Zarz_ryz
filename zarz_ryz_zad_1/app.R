@@ -61,15 +61,10 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  
-  
-   
    output$variation <- renderText ({
      
-     x <- input$curr
-     y <- input$year
-     variation <- var(zarz_ryz$USD, na.rm = TRUE)
-     paste("Wartosc wariancji jest rowna: ",variation, " w roku: ", y)
+     variation <- var(zarz_ryz[input$curr], na.rm = TRUE)
+     paste("Wartosc wariancji jest rowna: ",variation, " w roku: ", input$year)
 
      
    })
