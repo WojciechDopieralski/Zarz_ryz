@@ -34,7 +34,7 @@ zarz_ryz$`data/waluta` <- as.Date(zarz_ryz$`data/waluta`,origin = "1900-01-01") 
 
 waluty <- colnames(zarz_ryz[2:length(zarz_ryz)])
 
-daty <- unique(substring(zarz_ryz$`data/waluta`,1,4)) as.numeric()
+daty <- unique(substring(zarz_ryz$`data/waluta`,1,4))
 daty <- as.numeric(daty)
 
 
