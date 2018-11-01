@@ -89,15 +89,31 @@ server <- function(input, output) {
    output$variation <- renderText ({
      
      variation <- var(zarz_ryz[input$curr], na.rm = TRUE)
-     paste("Wartość wariancji jest równa: ",specify_decimal(variation,4), " w roku: ", input$year)
+     paste("Wartość wariancji jest równa: ",specify_decimal(variation,4), " w: ", input$year,"roku.")
     
 
    })
    
+   output$variation_int <- renderText ({
+     
+
+     paste("Wariancji co do zasady nie interpretujemy!")
+     
+     
+   })
+   
+   
    output$stan_dev <- renderText ({
      
      standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
-     paste("Wartość odchylenia standardowego jest równa: ", specify_decimal(standard_dev,4), " w roku: ", input$year)
+     paste("Wartość odchylenia standardowego jest równa: ", specify_decimal(standard_dev,4), " w: ",input$year,"roku.")
+     
+   })
+   
+   output$stan_dev_int <- renderText ({
+     
+     standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
+     paste("Cena", input$curr , "w stosunku do złotego odchylała się przeciętnie od średniej o:",specify_decimal(standard_dev,4),"w",input$year,"roku.")
      
    })
    
