@@ -48,6 +48,8 @@ DownsideDeviation(zarz_ryz$USD, MAR = mean(zarz_ryz$USD))
 ```{r}
 #Miary ksztaltu rozkladu
 
+skewness(zarz_ryz$USD, na.rm = TRUE, type = 1)
+kurtosis(zarz_ryz$USD, na.rm = TRUE, type = 1)
 
 ```
 
