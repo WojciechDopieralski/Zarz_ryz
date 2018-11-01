@@ -1,0 +1,62 @@
+---
+title: "zarz_ryzykiem_zadanie_1"
+output: html_notebook
+---
+
+
+
+```{r}
+#ladowanie pakietow
+
+library(openxlsx)
+library(PerformanceAnalytics)
+library(e1071)
+
+```
+
+```{r}
+#Wczytanie zbioru danych z pliku excel
+
+zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx", 
+                          sheet = "ceny walut", 
+                          startRow = 1)
+
+```
+
+```{r}
+#dostosowanie zbioru danych do dalszej analiy 
+
+zarz_ryz <- zarz_ryz[-c(1:2),]      #usuwam wiersze 1 i 2
+zarz_ryz <- as.data.frame(sapply(zarz_ryz, as.numeric))   #zmiana typu danych na numeric (ze wzgledu na pierwsze wiesze, cale kolumny ustawily sie jako zmienna tekstowa)
+zarz_ryz$`data/waluta` <- as.Date(zarz_ryz$`data/waluta`,origin = "1900-01-01") #Ustawienie pierwszej kolumny jako typ danych "data"
+
+```
+
+```{r}
+#Miary zmiennosci 
+
+var(zarz_ryz$USD)   #Wyliczenie wariancji 
+sd(zarz_ryz$USD)    #Wyliczenie odchylenia standardowego 
+(sd(zarz_ryz$USD)/mean(zarz_ryz$USD))*100   #Wyliczenie wsp????czynnika zmienno??ci
+mad(zarz_ryz$USD, na.rm = TRUE)
+DownsideDeviation(zarz_ryz$USD, MAR = mean(zarz_ryz$USD))
+
+ 
+
+```
+
+```{r}
+#Miary ksztaltu rozkladu
+
+
+```
+
+```{r}
+#Miary pozycyjne + srednia (ktora jest klasyczna)
+
+summary(zarz_ryz$USD) #Wyliczenie podstawowych cech statystyki opisowej
+quantile(zarz_ryz$USD, c(.95, .99)) #Percentyl i kwantyl dla alfa 5 procent. 
+
+
+```
+
