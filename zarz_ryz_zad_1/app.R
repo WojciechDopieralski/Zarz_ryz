@@ -27,6 +27,10 @@ waluty <- colnames(zarz_ryz[2:length(zarz_ryz)])
 daty <- unique(substring(zarz_ryz$`data/waluta`,1,4))
 daty <- as.numeric(daty)
 
+#Do skracania
+
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+
 
 
 ui <- fluidPage(
@@ -52,7 +56,8 @@ ui <- fluidPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-         textOutput("variation")
+         textOutput("variation"),
+         textOutput("stan_dev")
       )
    )
    )
@@ -64,11 +69,17 @@ server <- function(input, output) {
    output$variation <- renderText ({
      
      variation <- var(zarz_ryz[input$curr], na.rm = TRUE)
-     paste("Wartosc wariancji jest rowna: ",variation, " w roku: ", input$year)
+     paste("Wartosc wariancji jest rowna: ",specify_decimal(variation,4), " w roku: ", input$year)
+    
 
-     
    })
    
+   output$stan_dev <- renderText ({
+     
+     standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
+     paste("Wartosc odchylenia standardowego jest rowna: ", specify_decimal(standard_dev,4), " w roku: ", input$year)
+     
+   })
    
 }
 
