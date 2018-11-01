@@ -30,6 +30,15 @@ zarz_ryz <- zarz_ryz[-c(1:2),]      #usuwam wiersze 1 i 2
 zarz_ryz <- as.data.frame(sapply(zarz_ryz, as.numeric))   #zmiana typu danych na numeric (ze wzgledu na pierwsze wiesze, cale kolumny ustawily sie jako zmienna tekstowa)
 zarz_ryz$`data/waluta` <- as.Date(zarz_ryz$`data/waluta`,origin = "1900-01-01") #Ustawienie pierwszej kolumny jako typ danych "data"
 
+#Wyciagniecie wszystkich walut i lat
+
+waluty <- colnames(zarz_ryz[2:length(zarz_ryz)])
+
+daty <- unique(substring(zarz_ryz$`data/waluta`,1,4)) as.numeric()
+daty <- as.numeric(daty)
+
+
+
 ```
 
 ```{r}
