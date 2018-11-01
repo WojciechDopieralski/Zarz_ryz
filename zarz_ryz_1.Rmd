@@ -44,13 +44,12 @@ daty <- as.numeric(daty)
 ```{r}
 #Miary zmiennosci 
 
+
 var(zarz_ryz$USD)   #Wyliczenie wariancji 
 sd(zarz_ryz$USD)    #Wyliczenie odchylenia standardowego 
 (sd(zarz_ryz$USD)/mean(zarz_ryz$USD))*100   #Wyliczenie wsp????czynnika zmienno??ci
 mad(zarz_ryz$USD, na.rm = TRUE)
 DownsideDeviation(zarz_ryz$USD, MAR = mean(zarz_ryz$USD))
-
- 
 
 ```
 
