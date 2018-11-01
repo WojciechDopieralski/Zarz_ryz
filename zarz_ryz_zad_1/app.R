@@ -57,7 +57,27 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          textOutput("variation"),
-         textOutput("stan_dev")
+         textOutput("variation_int"),
+         textOutput("stan_dev"),
+         textOutput("stan_dev_int"),
+         textOutput("coeff_of_var"),
+         textOutput("coeff_of_var_int"),
+         textOutput("avg_dev"),
+         textOutput("avg_dev_int"),
+         textOutput("downside_dev"),
+         textOutput("downside_dev_int"),
+         textOutput("skewness"),
+         textOutput("skewness_int"),
+         textOutput("kurtosis_dev"),
+         textOutput("kurtosis_int"),
+         textOutput("percentile"),
+         textOutput("percentile_int"),
+         textOutput("five_alfa_quartile"),
+         textOutput("five_alfa_quartile_int"),
+         textOutput("basic_measures"),
+         textOutput("basic_measures_int")
+         
+         
       )
    )
    )
@@ -69,7 +89,7 @@ server <- function(input, output) {
    output$variation <- renderText ({
      
      variation <- var(zarz_ryz[input$curr], na.rm = TRUE)
-     paste("Wartosc wariancji jest rowna: ",specify_decimal(variation,4), " w roku: ", input$year)
+     paste("Wartość wariancji jest równa: ",specify_decimal(variation,4), " w roku: ", input$year)
     
 
    })
@@ -77,7 +97,7 @@ server <- function(input, output) {
    output$stan_dev <- renderText ({
      
      standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
-     paste("Wartosc odchylenia standardowego jest rowna: ", specify_decimal(standard_dev,4), " w roku: ", input$year)
+     paste("Wartość odchylenia standardowego jest równa: ", specify_decimal(standard_dev,4), " w roku: ", input$year)
      
    })
    
