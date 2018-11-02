@@ -3,6 +3,7 @@ library(shiny)
 library(openxlsx)
 library(PerformanceAnalytics)
 library(e1071)
+library(dplyr)
 # library(httr)
 # library(rio)
 
