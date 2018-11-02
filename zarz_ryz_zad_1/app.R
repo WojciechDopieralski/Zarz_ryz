@@ -9,8 +9,8 @@ library(e1071)
 #Wczytanie zbioru danych z pliku excel
 
 
-# zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx", 
-#                       sheet = "ceny walut", 
+# zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx",
+#                       sheet = "ceny walut",
 #                        startRow = 1)
 
 
@@ -26,6 +26,9 @@ waluty <- colnames(zarz_ryz[2:length(zarz_ryz)])
 
 daty <- unique(substring(zarz_ryz$`data/waluta`,1,4))
 daty <- as.numeric(daty)
+
+min_date <- min(zarz_ryz$`data/waluta`)
+max_date <- max(zarz_ryz$`data/waluta`)
 
 #Do skracania
 
@@ -50,8 +53,19 @@ ui <- fluidPage(
         selectInput(inputId = "curr",
                     label = "Pick currency:",
                     choices = waluty,
-                    selected = "USD")
+                    selected = "USD"),
+        
+        dateRangeInput(inputId = "date",
+                  label = "Select dates:",
+                  start = "2013",
+                  end = "2014",
+                  format = "yyyy",
+                  min = min_date, 
+                  max = max_date,
+                  startview = "year")
       ),
+      
+      
       
       
       # Show a plot of the generated distribution
