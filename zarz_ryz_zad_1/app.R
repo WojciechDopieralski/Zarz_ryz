@@ -46,21 +46,24 @@ ui <- fluidPage(
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
+        width = 3,
+        #Zostawione w razie gdyby wymagane byly warunki (np. wybor dokladny, a filtrowanie tylko po roku)
          selectInput(inputId = "year",
                      label = "Pick year:",
                      choices = daty,
                      selected = 2017),
-      
+        #Pole odpowiada za wybor waluty 
         selectInput(inputId = "curr",
                     label = "Pick currency:",
                     choices = waluty,
                     selected = "USD"),
-        
+        #Pole odpowiada za wybor dokladniej daty wzietej pod uwage przy badaniu 
+        # Co zwrocic, gdy nie ma obserwacji w danym okresie 
         dateRangeInput(inputId = "date",
                   label = "Select dates:",
-                  start = "2013",
-                  end = "2014",
-                  format = "yyyy",
+                  start = "2007-01-04",
+                  end = "2007-12-31",
+                  format = "yyyy-mm-dd",
                   min = min_date, 
                   max = max_date,
                   startview = "year")
@@ -71,10 +74,8 @@ ui <- fluidPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-         textOutput("variation"),
-         textOutput("variation_int"),
-         textOutput("stan_dev"),
-         textOutput("stan_dev_int"),
+         htmlOutput("variation"),
+         htmlOutput("stan_dev"),
          textOutput("coeff_of_var"),
          textOutput("coeff_of_var_int"),
          textOutput("avg_dev"),
@@ -101,36 +102,85 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-   output$variation <- renderText ({
+   output$variation <- renderUI ({
      
-     variation <- var(zarz_ryz[input$curr], na.rm = TRUE)
-     paste("Wartość wariancji jest równa: ",specify_decimal(variation,4), " w: ", input$year,"roku.")
-    
-
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     #Wyliczenie wartosci wariancji dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     variation <- var(zarz_ryz_fil[input$curr], na.rm = TRUE)
+     if (is.na(variation)) {
+       variation <- "Brak danych w podanym okresie."
+     }
+      
+       #Wyswietlenie interpretacji, zakladajac 2 opcje: Wariacja wyliczona i niewyliczona.
+       if(is.character(variation)) { HTML(
+         paste(variation),
+         "<br/>",
+         paste("Wariancji co do zasady nie interpretujemy!")
+       )}
+     
+       else {HTML (
+         paste("Wartość wariancji jest równa: ",
+         specify_decimal(variation,4),
+         " w przedziale czasowym od: ",
+         input$date[1],
+         "do:",
+         input$date[2],
+         "." ),
+         "<br/>",
+         paste("Wariancji co do zasady nie interpretujemy!"))}
+ 
    })
    
-   output$variation_int <- renderText ({
+   output$stan_dev <- renderUI ({
      
-
-     paste("Wariancji co do zasady nie interpretujemy!")
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
      
+     #Wyliczenie wartosci odch stand. dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
      
+     standard_dev <- sd(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)
+     
+     if (is.na(standard_dev)) {
+       standard_dev <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     if(is.character(standard_dev)) { HTML(
+       paste(standard_dev),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )}
+     
+     else {HTML (
+       paste("Wartość odchylenia standardowego jest równa: ",
+             specify_decimal(standard_dev,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ),
+       "<br/>",
+       paste("Cena",
+             input$curr,
+             "w stosunku do złotego odchylała się przeciętnie od średniej o:",
+             specify_decimal(standard_dev,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ))}
    })
    
-   
-   output$stan_dev <- renderText ({
-     
-     standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
-     paste("Wartość odchylenia standardowego jest równa: ", specify_decimal(standard_dev,4), " w: ",input$year,"roku.")
-     
-   })
-   
-   output$stan_dev_int <- renderText ({
-     
-     standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
-     paste("Cena", input$curr , "w stosunku do złotego odchylała się przeciętnie od średniej o:",specify_decimal(standard_dev,4),"w",input$year,"roku.")
-     
-   })
+   # output$stan_dev_int <- renderText ({
+   #   
+   #   standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
+   #   paste("Cena", input$curr , "w stosunku do złotego odchylała się przeciętnie od średniej o:",specify_decimal(standard_dev,4),"w",input$year,"roku.")
+   #   
+   # })
    
 }
 
