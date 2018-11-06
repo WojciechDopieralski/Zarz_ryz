@@ -9,11 +9,15 @@ library(dplyr)
 
 #Wczytanie zbioru danych z pliku excel
 
+ 
+#   zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx",
+#                         sheet = "ceny walut",
+#                          startRow = 1)
+# 
+# save(zarz_ryz, file="zarz_ryz_zad_1/data.RData")
+load("data.RData")
 
-# zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx",
-#                       sheet = "ceny walut",
-#                        startRow = 1)
-
+zarz_ryz1 <- janitor::clean_names(zarz_ryz)
 
 #dostosowanie zbioru danych do dalszej analiy 
 
@@ -76,8 +80,7 @@ ui <- fluidPage(
       mainPanel(
          htmlOutput("variation"),
          htmlOutput("stan_dev"),
-         textOutput("coeff_of_var"),
-         textOutput("coeff_of_var_int"),
+         htmlOutput("coeff_of_var"),
          textOutput("avg_dev"),
          textOutput("avg_dev_int"),
          textOutput("downside_dev"),
@@ -175,12 +178,68 @@ server <- function(input, output) {
              "." ))}
    })
    
-   # output$stan_dev_int <- renderText ({
-   #   
-   #   standard_dev <- sd(as.numeric(unlist(zarz_ryz[input$curr])), na.rm = TRUE)
-   #   paste("Cena", input$curr , "w stosunku do złotego odchylała się przeciętnie od średniej o:",specify_decimal(standard_dev,4),"w",input$year,"roku.")
-   #   
-   # })
+   output$coeff_of_var <- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     #Wyliczenie wartosci wspoczynnika zmiennosci dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     
+     standard_dev <- sd(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)
+     avg <- mean(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)  
+     coef <- (standard_dev/avg)*100 
+     
+     if (is.na(standard_dev)) {
+       standard_dev <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: wspolczynnik zmiennosci wyliczony i niewyliczony.
+     
+     if(is.character(standard_dev) == T) { HTML(
+       paste(standard_dev),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )} else {HTML (
+       paste("Wartosc wspolczynnika zmiennosci jest rowna: ",
+             specify_decimal(coef,2),
+             "%",
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ),
+       "<br/>")}
+     
+       if (coef <= 35) {
+      HTML( paste("Współczynnik zmienności dla",
+             input$curr,
+             "jest niski, a więc zmienność w badanym okresie była niska. Okres, od:",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ))
+
+       } else if (coef > 35 & coef < 65) {
+     HTML( paste(  "Współczynnik zmienności dla",
+         input$curr,
+         "jest umiarkowany, a więc zmienność w badanym okresie była umiarowana. Okres, od:",
+         input$date[1],
+         "do:",
+         input$date[2],
+         "."))
+       } else {
+         HTML( paste(  "Współczynnik zmienności dla",
+                       input$curr,
+                       "jest wysoki lub bardzo wysoki, a więc zmienność w badanym okresie jest zbyt wysoka! Okres, od:",
+                       input$date[1],
+                       "do:",
+                       input$date[2],
+                       "."))
+
+       }
+   })
+
    
 }
 
