@@ -37,11 +37,9 @@ zarz_ryz$`data/waluta` <- as.Date(zarz_ryz$`data/waluta`,origin = "1900-01-01") 
 waluty <- colnames(zarz_ryz[2:length(zarz_ryz)])
 
 zarz_ryz_nd <- zarz_ryz[,-1]
-
-lst <- lapply(zarz_ryz, Delt, k=1) 
-
-lst <- as.data.frame(lst)
-
+zarz_ryz_sto_zw <- lapply(zarz_ryz_nd, Delt, k=1) 
+zarz_ryz_sto_zw <- as.data.frame(zarz_ryz_sto_zw)
+zarz_ryz_sto_zw <- cbind (zarz_ryz[,1],zarz_ryz_sto_zw)
 
 daty <- unique(substring(zarz_ryz$`data/waluta`,1,4))
 daty <- as.numeric(daty)

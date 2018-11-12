@@ -40,6 +40,16 @@ max_date <- max(zarz_ryz$`data/waluta`)
 
 specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
 
+# Stopy zwrotu 
+
+zarz_ryz_nd <- zarz_ryz[,-1]
+zarz_ryz_sto_zw <- lapply(zarz_ryz_nd, Delt, k=1) 
+zarz_ryz_sto_zw <- as.data.frame(zarz_ryz_sto_zw)
+zarz_ryz_sto_zw <- cbind (zarz_ryz[,1],zarz_ryz_sto_zw)
+zarz_ryz_coln <- colnames(zarz_ryz)
+names(zarz_ryz_sto_zw) <- zarz_ryz_coln 
+
+
 
 
 ui <- fluidPage(
