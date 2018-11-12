@@ -247,6 +247,43 @@ server <- function(input, output) {
    
    output$avg_dev <- renderUI ({
      
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     #Wyliczenie wartosci odch stand. dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     
+     standard_mad <- mad(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)
+     
+     if (is.na(standard_mad)) {
+       standard_mad <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     if(is.character(standard_mad)) { HTML(
+       paste(standard_dev),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )}
+     
+     else {HTML (
+       paste("Wartość odchylenia standardowego jest równa: ",
+             specify_decimal(standard_mad,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ),
+       "<br/>",
+       paste("Cena",
+             input$curr,
+             "w stosunku do złotego odchylała się przeciętnie od średniej o:",
+             specify_decimal(standard_mad,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ))}
      
    })
 
