@@ -50,8 +50,6 @@ zarz_ryz_coln <- colnames(zarz_ryz)
 names(zarz_ryz_sto_zw) <- zarz_ryz_coln 
 
 
-
-
 ui <- fluidPage(
    
    # Application title
@@ -304,14 +302,15 @@ server <- function(input, output) {
      #Wyliczenie wartosci semi odch ujemnego dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
      
      down_mad <- DownsideDeviation(as.numeric(unlist(zarz_ryz_fil[input$curr])), MAR = mean(as.numeric(unlist(zarz_ryz_fil[input$curr]))))
+     standard_dev <- sd(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)
      
-     if (is.na(down_mad)) {
-       down_mad <- "Brak danych w podanym okresie."
+     if (is.na(standard_dev)) {
+       standard_dev <- "Brak danych w podanym okresie."
      }
      
      #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
-     if(is.character(down_mad)) { HTML(
-       paste(down_mad),
+     if(is.character(standard_dev)) { HTML(
+       paste(standard_dev),
        "<br/>",
        paste("Brak wartosci do interpretacji!")
      )}
@@ -338,7 +337,141 @@ server <- function(input, output) {
    })
    
    
+   output$skewness <- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
    
+     #Wyliczenie wartosci skośności dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     
+     skew <- skewness(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE, type = 1)
+     
+     if (is.na(skew)) {
+       skew <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     if(is.character(skew)) { HTML(
+       paste(skew),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )} else if (skew > 0) {
+       HTML (
+         paste("Wartość współczynnika asymetrii jest równa: ",
+               specify_decimal(skew,4),
+               " w przedziale czasowym od: ",
+               input$date[1],
+               "do:",
+               input$date[2],
+               "." ),
+         "<br/>",
+       paste("Wystąpiła asymetria prawostronna, w przedziale czasowym od",
+             input$date[1],
+             "do:",
+             input$date[2],
+             ". Jest ona tym większa im większa wartość współczynnika." ),
+       "<br/>")} else if (skew <0) {
+         HTML (
+           paste("Wartość współczynnika asymetrii jest równa: ",
+                 specify_decimal(skew,4),
+                 " w przedziale czasowym od: ",
+                 input$date[1],
+                 "do:",
+                 input$date[2],
+                 "." ),
+           "<br/>",
+         paste("Wystąpiła asymetria lewostronna, w przedziale czasowym od ",
+               specify_decimal(skew,4),
+               " w przedziale czasowym od: ",
+               input$date[1],
+               "do:",
+               input$date[2],
+               ". Jest ona tym większa im większa wartość współczynnika." )
+         )} else {
+           HTML (
+           paste("W wybranym przedziale czasowym nie wysąpiła asymetria ")
+           )
+         }
+      
+     
+   })
+   
+   output$kurtosis_dev<- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     kurto <- kurtosis(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE, type = 1)
+     
+     if (is.na(kurto)) {
+       kurto <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     if(is.character(kurto)) { HTML(
+       paste(kurto),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )} else if (kurto > 0) {
+       HTML (
+         paste("Wartość współczynnika kurtozy jest równa: ",
+               specify_decimal(kurto,4),
+               " w przedziale czasowym od: ",
+               input$date[1],
+               "do:",
+               input$date[2],
+               "." ),
+         "<br/>",
+         paste("Wystąpiła znaczna koncentrcja wyników w okół średniej, w przedziale czasowym od",
+               input$date[1],
+               "do:",
+               input$date[2],
+               ". Jest ona tym większa im większa wartość współczynnika." ),
+         "<br/>")} else if (kurto <0) {
+           HTML (
+             paste("Wartość współczynnika kurtozy jest równa: ",
+                   specify_decimal(kurto,4),
+                   " w przedziale czasowym od: ",
+                   input$date[1],
+                   "do:",
+                   input$date[2],
+                   "." ),
+             "<br/>",
+             paste("Wystąpiła słaba koncentrcja wyników w okół średniej,, w przedziale czasowym od ",
+                   specify_decimal(kurto,4),
+                   " w przedziale czasowym od: ",
+                   input$date[1],
+                   "do:",
+                   input$date[2],
+                   ". Jest ona tym słabsza im większa wartość współczynnika." )
+           )} else {
+             HTML (
+               paste("W wybranym przedziale czasowym nie wysąpiła asymetria ")
+             )
+           }
+     
+   })
+   
+   output$percentile <- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+   })
+   
+   output$basic_measures <- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     summ <- summary(as.numeric(unlist(zarz_ryz_fil[input$curr])))
+     
+     
+   })
 }
 
 # Run the application 

@@ -71,7 +71,7 @@ kurtosis(zarz_ryz$USD, na.rm = TRUE, type = 1)
 ```{r}
 #Miary pozycyjne + srednia (ktora jest klasyczna)
 
-summary(zarz_ryz$USD) #Wyliczenie podstawowych cech statystyki opisowej
+summmm <- summary(zarz_ryz$USD) #Wyliczenie podstawowych cech statystyki opisowej
 quantile(zarz_ryz$USD, c(.95, .99)) #Percentyl i kwantyl dla alfa 5 procent. 
 
 
