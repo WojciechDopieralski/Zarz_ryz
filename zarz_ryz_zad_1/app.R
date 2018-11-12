@@ -77,24 +77,22 @@ ui <- fluidPage(
       
       
       
-      # Show a plot of the generated distribution
+      # 
       mainPanel(
          htmlOutput("variation"),
          htmlOutput("stan_dev"),
          htmlOutput("coeff_of_var"),
          htmlOutput("avg_dev"),
-         textOutput("downside_dev"),
-         textOutput("downside_dev_int"),
-         textOutput("skewness"),
-         textOutput("skewness_int"),
-         textOutput("kurtosis_dev"),
-         textOutput("kurtosis_int"),
-         textOutput("percentile"),
-         textOutput("percentile_int"),
-         textOutput("five_alfa_quartile"),
-         textOutput("five_alfa_quartile_int"),
-         textOutput("basic_measures"),
-         textOutput("basic_measures_int")
+         htmlOutput("downside_dev"),
+         
+         htmlOutput("skewness"),
+         htmlOutput("kurtosis_dev"),
+
+         
+         htmlOutput("percentile"),
+         htmlOutput("five_alfa_quartile"),
+         htmlOutput("basic_measures")
+
          
          
       )
@@ -251,7 +249,7 @@ server <- function(input, output) {
      zarz_ryz_fil <- zarz_ryz %>% 
        filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
      
-     #Wyliczenie wartosci odch stand. dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     #Wyliczenie wartosci odch śred dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
      
      standard_mad <- mad(as.numeric(unlist(zarz_ryz_fil[input$curr])), na.rm = TRUE)
      
@@ -259,15 +257,15 @@ server <- function(input, output) {
        standard_mad <- "Brak danych w podanym okresie."
      }
      
-     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch śred. wyliczone i niewyliczone.
      if(is.character(standard_mad)) { HTML(
-       paste(standard_dev),
+       paste(standard_mad),
        "<br/>",
        paste("Brak wartosci do interpretacji!")
      )}
      
      else {HTML (
-       paste("Wartość odchylenia standardowego jest równa: ",
+       paste("Wartość odchylenia średniego jest równa: ",
              specify_decimal(standard_mad,4),
              " w przedziale czasowym od: ",
              input$date[1],
@@ -286,8 +284,48 @@ server <- function(input, output) {
              "." ))}
      
    })
-
    
+   output$downside_dev <- renderUI ({
+     
+     #Filtrowanie po latach, zgodnie z zal zadania (korzysta z dokladnego okresu)
+     zarz_ryz_fil <- zarz_ryz %>% 
+       filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
+     
+     #Wyliczenie wartosci semi odch ujemnego dla zbioru PO filtorwaniu. Uwzglednienie zbioru zlozonego z samych brakow danych
+     
+     down_mad <- DownsideDeviation(as.numeric(unlist(zarz_ryz_fil[input$curr])), MAR = mean(as.numeric(unlist(zarz_ryz_fil[input$curr]))))
+     
+     if (is.na(down_mad)) {
+       down_mad <- "Brak danych w podanym okresie."
+     }
+     
+     #Wyswietlenie interpretacji, zakladajac 2 opcje: odch stand. wyliczone i niewyliczone.
+     if(is.character(down_mad)) { HTML(
+       paste(down_mad),
+       "<br/>",
+       paste("Brak wartosci do interpretacji!")
+     )}
+     
+     else {HTML (
+       paste("Wartość semi ochylenia ujemnego jest równa: ",
+             specify_decimal(down_mad,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ),
+       "<br/>",
+       paste("Biorąc pod uwage wartosci ponizej sredniej cena",
+             input$curr,
+             "w stosunku do złotego odchylała się przeciętnie od średniej o:",
+             specify_decimal(down_mad,4),
+             " w przedziale czasowym od: ",
+             input$date[1],
+             "do:",
+             input$date[2],
+             "." ))}
+     
+   })
    
    
    
