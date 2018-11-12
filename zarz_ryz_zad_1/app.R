@@ -1,23 +1,24 @@
-
 library(shiny)
 library(openxlsx)
 library(PerformanceAnalytics)
 library(e1071)
 library(dplyr)
+library(quantmod)
+
 # library(httr)
 # library(rio)
 
 #Wczytanie zbioru danych z pliku excel
 
  
-#   zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx",
-#                         sheet = "ceny walut",
-#                          startRow = 1)
-# 
-# save(zarz_ryz, file="zarz_ryz_zad_1/data.RData")
-load("data.RData")
+  zarz_ryz <- read.xlsx(xlsxFile = "01_nstacj_waluty_STACJONARNE.xlsx",
+                        sheet = "ceny walut",
+                        startRow = 1)
 
-zarz_ryz1 <- janitor::clean_names(zarz_ryz)
+
+# zarz_ryz <- load("data.RData")
+# zarz_ryz1 <- janitor::clean_names(zarz_ryz)
+  
 
 #dostosowanie zbioru danych do dalszej analiy 
 
@@ -81,8 +82,7 @@ ui <- fluidPage(
          htmlOutput("variation"),
          htmlOutput("stan_dev"),
          htmlOutput("coeff_of_var"),
-         textOutput("avg_dev"),
-         textOutput("avg_dev_int"),
+         htmlOutput("avg_dev"),
          textOutput("downside_dev"),
          textOutput("downside_dev_int"),
          textOutput("skewness"),
@@ -210,8 +210,12 @@ server <- function(input, output) {
              input$date[2],
              "." ),
        "<br/>")}
-     
-       if (coef <= 35) {
+   
+     if (is.na(coef)) {
+       HTML( paste(  "Współczynnik zmienności dla",
+                     input$curr,
+                     "nie istnieje, ze wzgledu na brak danych"
+       ))} else if (coef <= 35) {
       HTML( paste("Współczynnik zmienności dla",
              input$curr,
              "jest niski, a więc zmienność w badanym okresie była niska. Okres, od:",
@@ -228,7 +232,7 @@ server <- function(input, output) {
          "do:",
          input$date[2],
          "."))
-       } else {
+       } else if ( coef >= 65){
          HTML( paste(  "Współczynnik zmienności dla",
                        input$curr,
                        "jest wysoki lub bardzo wysoki, a więc zmienność w badanym okresie jest zbyt wysoka! Okres, od:",
@@ -236,10 +240,19 @@ server <- function(input, output) {
                        "do:",
                        input$date[2],
                        "."))
-
-       }
+   
+             } 
+   })
+   
+   
+   output$avg_dev <- renderUI ({
+     
+     
    })
 
+   
+   
+   
    
 }
 
