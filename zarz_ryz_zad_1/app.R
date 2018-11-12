@@ -52,10 +52,10 @@ ui <- fluidPage(
       sidebarPanel(
         width = 3,
         #Zostawione w razie gdyby wymagane byly warunki (np. wybor dokladny, a filtrowanie tylko po roku)
-         selectInput(inputId = "year",
-                     label = "Pick year:",
-                     choices = daty,
-                     selected = 2017),
+         # selectInput(inputId = "year",
+         #             label = "Pick year:",
+         #             choices = daty,
+         #             selected = 2017),
         #Pole odpowiada za wybor waluty 
         selectInput(inputId = "curr",
                     label = "Pick currency:",
