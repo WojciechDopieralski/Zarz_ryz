@@ -468,9 +468,16 @@ server <- function(input, output) {
      zarz_ryz_fil <- zarz_ryz %>% 
        filter(zarz_ryz$`data/waluta` >= input$date[1] & zarz_ryz$`data/waluta` <= input$date[2])
      
-     summ <- summary(as.numeric(unlist(zarz_ryz_fil[input$curr])))
+     #as.numeric(unlist())
+     summ <- summary(zarz_ryz_fil[input$curr])
      
-     
+     HTML (
+       if (is.na(as.numeric(sub('.*:', '', summ[1])))) {
+         print("Brak danych dla wybranej waluty bądź wybranego okresu.")
+       } else {
+       summ
+       }
+     )
    })
 }
 
